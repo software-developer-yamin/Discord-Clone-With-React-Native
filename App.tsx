@@ -19,12 +19,18 @@ export default function App() {
     try {
       await client.connectUser(
         {
-          id: "user-1",
-          name: "User 1",
+          id: "user-2",
+          name: "User 2",
           image: "https://i.pravatar.cc/300?img=1",
         },
-        client.devToken("user-1")
+        client.devToken("user-2")
       );
+
+      // create a channel
+      const channel = client.channel("team", "general-2", {
+        name: "General 2",
+      });
+      await channel.create();
     } catch (err: any) {
       Alert.alert("Error", err.message);
     }
