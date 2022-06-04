@@ -5,8 +5,11 @@ import { StreamChat } from "stream-chat";
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
 import Navigation from "./navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Alert } from "react-native";
+import { ChannelList, Chat, OverlayProvider } from "stream-chat-expo";
+import { LogBox } from "react-native";
+LogBox.ignoreLogs(["exported from 'deprecated-react-native-prop-types'"]);
 
 const API_KEY = "je8mzyd5zvdm";
 const client = StreamChat.getInstance(API_KEY);
@@ -14,6 +17,7 @@ const client = StreamChat.getInstance(API_KEY);
 export default function App() {
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
+  const [isReady, setIsReady] = useState(false);
 
   const connectUser = async () => {
     try {
@@ -25,6 +29,7 @@ export default function App() {
         },
         client.devToken("user-2")
       );
+      setIsReady(true);
 
       // create a channel
       const channel = client.channel("team", "general-2", {
@@ -40,12 +45,17 @@ export default function App() {
     connectUser();
   }, []);
 
-  if (!isLoadingComplete) {
+  if (!isLoadingComplete && !isReady) {
     return null;
   } else {
     return (
       <SafeAreaProvider>
-        <Navigation colorScheme={colorScheme} />
+        <OverlayProvider>
+          <Chat client={client}>
+            {/* <Navigation colorScheme={colorScheme} /> */}
+            <ChannelList />
+          </Chat>
+        </OverlayProvider>
         <StatusBar />
       </SafeAreaProvider>
     );
